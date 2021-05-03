@@ -414,6 +414,7 @@ Public Class F02_PedidoNuevo
             .CellStyle.TextAlignment = Janus.Windows.GridEX.TextAlignment.Far
             .FormatString = "0.00"
             .AggregateFunction = AggregateFunction.Sum
+
         End With
         With JGr_DetallePedido.RootTable.Columns("obdesc")
             .Visible = True
@@ -436,6 +437,9 @@ Public Class F02_PedidoNuevo
             .CellStyle.TextAlignment = Janus.Windows.GridEX.TextAlignment.Far
             .FormatString = "0.00"
             .AggregateFunction = AggregateFunction.Sum
+
+            '.TotalFormatString = "{0:N2}"
+            '.TotalFormatMode = Janus.Windows.GridEX.FormatMode.UseStringFormat
         End With
         With JGr_DetallePedido.RootTable.Columns("obfamilia")
             .Caption = "Familia"
@@ -463,6 +467,8 @@ Public Class F02_PedidoNuevo
             .TotalRowPosition = TotalRowPosition.BottomFixed
             'Diseño de la tabla
             .VisualStyle = VisualStyle.Office2007
+
+
         End With
 
     End Sub
@@ -3538,7 +3544,7 @@ Public Class F02_PedidoNuevo
                         cantidad = JGr_DetallePedido.GetValue("CantidadConversion")
                         productoId = JGr_DetallePedido.CurrentRow.Cells("CodProd").Value
 
-                        Dim cantidadDecimal As Decimal = (Convert.ToDecimal(cantidad) - Int(Val(cantidad))) * 10
+                        Dim cantidadDecimal As Decimal = (Convert.ToDecimal(cantidad) - Int(Val(cantidad))) * 100
                         Dim cantidadDecimalEntera = Convert.ToInt32(cantidadDecimal)
                         Dim unidadConversion As Decimal = L_ObtenerUnidadConversionProducto(productoId.ToString())
                         Dim totalCantidad = (Int(Val(cantidad)) * unidadConversion) + cantidadDecimalEntera
@@ -3548,11 +3554,11 @@ Public Class F02_PedidoNuevo
                         atributo = JGr_DetallePedido.GetValue("Atributo")
                         descuento = JGr_DetallePedido.GetValue("Descuento")
                         If atributo = -1 Then
-                            JGr_DetallePedido.CurrentRow.Cells("Monto").Value = 1 * precio
+                            JGr_DetallePedido.CurrentRow.Cells("Monto").Value = 1 * (precio / unidadConversion)
                             JGr_DetallePedido.CurrentRow.Cells("Total").Value = JGr_DetallePedido.CurrentRow.Cells("Monto").Value - descuento
                             JGr_DetallePedido.CurrentRow.Cells("Cantidad").Value = totalCantidad
                         Else
-                            JGr_DetallePedido.CurrentRow.Cells("Monto").Value = totalCantidad * precio
+                            JGr_DetallePedido.CurrentRow.Cells("Monto").Value = totalCantidad * (precio / unidadConversion)
                             JGr_DetallePedido.CurrentRow.Cells("Total").Value = JGr_DetallePedido.CurrentRow.Cells("Monto").Value - descuento
                             JGr_DetallePedido.CurrentRow.Cells("Cantidad").Value = totalCantidad
                         End If
@@ -3650,7 +3656,7 @@ Public Class F02_PedidoNuevo
                     If atributo = -1 Then
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obpcant") = totalCantidad
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obCantidad") = Tb_CantProd2.Value
-                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obptot") = CDbl(1) * precio
+                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obptot") = CDbl(1) * (precio / unidadConversion)
 
                         JGr_Productos.Focus()
                         JGr_Productos.MoveTo(JGr_Productos.FilterRow)
@@ -3658,7 +3664,7 @@ Public Class F02_PedidoNuevo
                     Else
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obpcant") = totalCantidad
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obCantidad") = Tb_CantProd2.Value
-                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obptot") = CDbl(totalCantidad) * precio
+                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obptot") = CDbl(totalCantidad) * (precio / unidadConversion)
 
                         JGr_Productos.Focus()
                         JGr_Productos.MoveTo(JGr_Productos.FilterRow)
