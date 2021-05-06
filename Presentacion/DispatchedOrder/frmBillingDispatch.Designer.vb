@@ -23,8 +23,8 @@ Partial Class frmBillingDispatch
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBillingDispatch))
         Dim cbChoferes_DesignTimeLayout As Janus.Windows.GridEX.GridEXLayout = New Janus.Windows.GridEX.GridEXLayout()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBillingDispatch))
         Me.PanelBase = New System.Windows.Forms.Panel()
         Me.PanelPedido = New System.Windows.Forms.Panel()
         Me.panelFondo = New System.Windows.Forms.Panel()
@@ -51,6 +51,7 @@ Partial Class frmBillingDispatch
         Me.btVolverDist = New DevComponents.DotNetBar.ButtonX()
         Me.cbChoferes = New Janus.Windows.GridEX.EditControls.MultiColumnCombo()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.btGenerarRedondeo = New DevComponents.DotNetBar.ButtonX()
         Me.PanelBase.SuspendLayout()
         Me.PanelPedido.SuspendLayout()
         Me.panelFondo.SuspendLayout()
@@ -153,6 +154,7 @@ Partial Class frmBillingDispatch
         '
         'PanelSuperior
         '
+        Me.PanelSuperior.Controls.Add(Me.btGenerarRedondeo)
         Me.PanelSuperior.Controls.Add(Me.cbEstado)
         Me.PanelSuperior.Controls.Add(Me.LabelX4)
         Me.PanelSuperior.Controls.Add(Me.btnFactura)
@@ -455,6 +457,21 @@ Partial Class frmBillingDispatch
         Me.Timer1.Enabled = True
         Me.Timer1.Interval = 1000
         '
+        'btGenerarRedondeo
+        '
+        Me.btGenerarRedondeo.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton
+        Me.btGenerarRedondeo.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground
+        Me.btGenerarRedondeo.Dock = System.Windows.Forms.DockStyle.Right
+        Me.btGenerarRedondeo.Image = Global.Presentacion.My.Resources.Resources.GEN_PEDIDOS_AUTOMATICAMENTE_ORI
+        Me.btGenerarRedondeo.ImageFixedSize = New System.Drawing.Size(30, 30)
+        Me.btGenerarRedondeo.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.btGenerarRedondeo.Location = New System.Drawing.Point(759, 0)
+        Me.btGenerarRedondeo.Name = "btGenerarRedondeo"
+        Me.btGenerarRedondeo.Size = New System.Drawing.Size(75, 60)
+        Me.btGenerarRedondeo.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
+        Me.btGenerarRedondeo.TabIndex = 244
+        Me.btGenerarRedondeo.Text = "Generar Redondeo"
+        '
         'frmBillingDispatch
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -508,4 +525,5 @@ Partial Class frmBillingDispatch
     Friend WithEvents btnFactura As DevComponents.DotNetBar.ButtonX
     Friend WithEvents cbEstado As ComboBox
     Friend WithEvents LabelX4 As DevComponents.DotNetBar.LabelX
+    Friend WithEvents btGenerarRedondeo As DevComponents.DotNetBar.ButtonX
 End Class

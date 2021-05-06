@@ -9,6 +9,8 @@ Imports Logica.AccesoLogica
 Imports System.Drawing.Printing
 Imports System.IO
 Imports CrystalDecisions.Shared
+Imports Entidades
+
 
 Public Class frmBillingDispatch
     Dim _inter As Integer = 0
@@ -1470,6 +1472,31 @@ Public Class frmBillingDispatch
                     End If
                 Next
 
+                'Validación para controlar que se vuelva a Generar Redondeo
+                For i = 0 To dgjPedido.RowCount - 1
+                    dgjPedido.Row = i
+                    Dim IdPedido As String = dgjPedido.CurrentRow.Cells("Id").Value
+
+                    Dim dt As DataTable = L_PedidoPorId(IdPedido)
+                    Dim idCliente As String = dt.Rows(0).Item("oaccli").ToString
+                    If idCliente = "10744" Then
+                        Dim _Result2 As MsgBoxResult
+
+                        _Result2 = MsgBox("Primero se eliminará el pedido de redondeo", MsgBoxStyle.YesNo, "Advertencia")
+                        If _Result2 = MsgBoxResult.Yes Then
+                            L_EliminarTO001(IdPedido)
+                            L_PedidoDetalle_Borrar(IdPedido)
+                            L_EliminarTO001A(IdPedido)
+                            L_EliminarTO001C(IdPedido)
+                            L_EliminarTO001DEstado(IdPedido, "4")
+                        Else
+                            MostrarMensajeError("No puede volver a Distribucion sin antes eliminar el Pedido de Redondeo ")
+                            Exit Sub
+                        End If
+
+                    End If
+                Next
+
                 Dim idChofer = Me.cbChoferes.Value
                 Dim result = New LPedido().VolverPedidoDistribucion(listIdPedido, idChofer)
                 If (result) Then
@@ -1650,5 +1677,131 @@ Public Class frmBillingDispatch
             btnNotaVenta.Enabled = True
             lblCantidadPedido.Text = listaPedido.Count.ToString
         End If
+    End Sub
+
+    Private Sub btGenerarRedondeo_Click(sender As Object, e As EventArgs) Handles btGenerarRedondeo.Click
+        Try
+            Dim idChofer = Me.cbChoferes.Value
+            If (Not IsNumeric(idChofer)) Then
+                Throw New Exception("Debe seleccionar un chofer.")
+            End If
+            If (Convert.ToInt32(idChofer) = ENCombo.ID_SELECCIONAR) Then
+                Throw New Exception("Debe seleccionar un chofer.")
+            End If
+
+            'Validación para controlar que se vuelva a Generar Redondeo
+            For i = 0 To dgjPedido.RowCount - 1
+                dgjPedido.Row = i
+                Dim IdPedido As String = dgjPedido.CurrentRow.Cells("Id").Value
+
+                Dim dt As DataTable = L_PedidoPorId(IdPedido)
+                Dim idCliente As String = dt.Rows(0).Item("oaccli").ToString
+                If idCliente = "10744" Then
+                    Throw New Exception("Ya se generó redondeo")
+                End If
+            Next
+
+
+            Dim listResult = New LPedido().ListarDespachoXProductoDeChofer(idChofer, IIf(cbEstado.SelectedIndex = 0, ENEstadoPedido.DICTADO, ENEstadoPedido.ENTREGADO), Tb_Fecha.Value, Tb_FechaHasta.Value)
+            Dim lista = (From a In listResult
+                         Group a By a.canumi, a.cadesc, a.categoria Into grupo = Group
+                         Select New RDespachoXProducto With {
+                          .canumi = grupo.FirstOrDefault().canumi,
+                          .cacod = grupo.FirstOrDefault().cacod,
+                          .cadesc = grupo.FirstOrDefault().cadesc,
+                          .categoria = grupo.FirstOrDefault().categoria,
+                          .obpcant = IIf(grupo.Sum(Function(item) item.Unidad) > 0,
+                             (grupo.Sum(Function(item) item.Caja) + 1),
+                             grupo.Sum(Function(item) item.Caja)) * grupo.FirstOrDefault().Conversion,
+                          .Caja = IIf(grupo.Sum(Function(item) item.Unidad) > 0,
+                             grupo.Sum(Function(item) item.Caja) + 1,
+                             grupo.Sum(Function(item) item.Caja)),
+                          .Unidad = IIf(grupo.Sum(Function(item) item.Unidad) > 0, 0, grupo.Sum(Function(item) item.Unidad)),
+                          .Total = grupo.Sum(Function(item) item.Total)
+                        }).ToList()
+
+            'Variables a utilizar                                   
+            Dim Numi As String = ""
+            Dim Hora As String = Now.Hour.ToString() + ":" + Now.Minute.ToString()
+            Dim DiferenciaCaja As String
+            Dim ConversionProd As String
+            Dim ConversionCaja As String
+            Dim Cantidad As String
+            Dim Precio As String
+            Dim Subtotal As String
+            Dim CantidadTotal As String
+            Dim Cliente As String = "10744" 'Por defecto todos los redondeos irán al cliente de Redondeo
+            Dim ZonaCli As String
+            Dim Prevendedor As String
+            Dim Redondeo As Boolean
+
+
+            'Grabar pedido en la TO001
+            Dim dtCliente As DataTable = L_fnCliente(Cliente)
+            ZonaCli = dtCliente.Rows(0).Item("numZona").ToString
+            Dim dtPreV As DataTable = L_fnObtenerTabla("a.lanumi, c.cbnumi, c.cbdesc",
+                                                       "TL001 a inner join TL0012 b on a.lanumi=b.lcnumi inner join TC002 c on b.lccbnumi=c.cbnumi",
+                                                       "c.cbcat=3")
+            Dim dr As DataRow()
+            If (dtPreV.Rows.Count > 0) Then
+                dr = dtPreV.Select("lanumi=" + ZonaCli)
+                If (dr.Count > 0) Then
+                    Prevendedor = dr(0).Item("cbnumi").ToString
+
+                Else
+                    Prevendedor = 1
+                End If
+            End If
+
+            L_PedidoCabecera_Grabar(Numi, Date.Now.Date.ToString("yyyy/MM/dd"), Hora, Cliente, 100, cbChoferes.Value.ToString, "", "2", "1", "0")
+            L_PedidoCabecera_GrabarExtencion(Numi, Prevendedor, "2", "0", Date.Now.Date.ToString("yyyy/MM/dd"))
+            L_prGrabarTO001C(Numi, cbChoferes.Value)
+            L_GrabarTO001D(Numi, 4, "Distribución")
+
+
+
+            For i As Integer = 0 To listResult.Count - 1 Step 1
+                If (listResult(i).canumi) = (lista(i).canumi) Then
+                    DiferenciaCaja = lista(i).Caja - listResult(i).Caja
+                    ConversionCaja = DiferenciaCaja * listResult(i).Conversion
+                    Cantidad = ConversionCaja - listResult(i).Unidad
+                    ConversionProd = listResult(i).Conversion
+                    If DiferenciaCaja <> 0 Then
+                        Precio = (listResult(i).Total / listResult(i).obpcant) * ConversionProd
+                        Subtotal = (Precio / ConversionProd) * Cantidad
+                        CantidadTotal = Cantidad / 100
+                        L_PedidoDetalle_GrabarNuevo(Numi, (listResult(i).canumi), Cantidad, Precio, Subtotal, 0, Subtotal, 1, 1, CantidadTotal)
+                    End If
+                End If
+            Next
+            Dim VerificarDetallePedido As DataTable = L_PedidoDetalle_GeneralNuevo(-1, Numi)
+            If VerificarDetallePedido.Rows.Count = 0 Then
+                L_EliminarTO001(Numi)
+                L_EliminarTO001A(Numi)
+                L_EliminarTO001C(Numi)
+                L_EliminarTO001DEstado(Numi, "4")
+                ToastNotification.Show(Me, "No es necesario generar el pedido de redondeo".ToUpper, My.Resources.WARNING, 5000, eToastGlowColor.Green, eToastPosition.TopCenter)
+
+            End If
+
+            CargarPedidos()
+            btGenerarRedondeo.Enabled = False
+
+
+            'Dim empresaId = ObtenerEmpresaHabilitada()
+            'Dim empresaHabilitada As DataTable = ObtenerEmpresaTipoReporte(empresaId, Convert.ToInt32(ENReporte.DESPACHOXPRODUCTO))
+            'For Each fila As DataRow In empresaHabilitada.Rows
+            '    Select Case fila.Item("TipoReporte").ToString
+            '        Case ENReporteTipo.DESPACHOXPRODUCTO_AgrupadoXCategoria
+            '            Dim objrep As New DespachoXProducto
+            '            SerParametros(lista, objrep)
+            '        Case ENReporteTipo.DESPACHOXPRODUCTO_SinAgrupacion
+            '            Dim objrep As New DespachoXProductoSinAgrupacion
+            '            SerParametros(lista, objrep)
+            '    End Select
+            'Next
+        Catch ex As Exception
+            MostrarMensajeError(ex.Message)
+        End Try
     End Sub
 End Class

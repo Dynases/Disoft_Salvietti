@@ -1150,7 +1150,15 @@ Public Class AccesoLogica
         _Tabla = D_Datos_Tabla("DISTINCT TOP 10 oanumi,oafdoc,oahora,oaest,IIF(oaest=1,'PENDIENTE',IIF(oaest=2,'DICTADO','ENTREGADO')) as oaest2,DATEDIFF(dd, oafdoc,GETDATE()) as diasTrans,oaobs,oaobs2,IIF((select COUNT(ofnumiped) from TO0014 where ofnumiped=oanumi)>0,1,0 ) as reclamo,oapg", "TO001,TC004,TC0051,TL001", _Where + " order by oanumi desc")
         Return _Tabla
     End Function
+    Public Shared Function L_PedidoPorId(_Id As String) As DataTable
+        Dim _Tabla As DataTable
+        Dim _Where As String
+        _Where = "oanumi=" + _Id
 
+        Dim campos As String = "*"
+        _Tabla = D_Datos_Tabla(campos, "TO001", _Where)
+        Return _Tabla
+    End Function
     Public Shared Function L_PedidoCabecera_GeneralTotal(_Modo As Integer, Optional _Cadena As String = "") As DataTable
         Dim _Tabla As DataTable
         Dim _Where As String
@@ -1319,6 +1327,34 @@ Public Class AccesoLogica
         _Where = "oanumi = " + _Id
         _Err = D_Modificar_Datos("TO001", "oaest=0", _Where)
 
+    End Sub
+    Public Shared Sub L_EliminarTO001(_Id As String)
+        Dim _Where As String
+        Dim _Err As Boolean
+
+        _Where = "oanumi = " + _Id
+        _Err = D_Eliminar_Datos("TO001", _Where)
+    End Sub
+    Public Shared Sub L_EliminarTO001A(_Id As String)
+        Dim _Where As String
+        Dim _Err As Boolean
+
+        _Where = "oaato1numi = " + _Id
+        _Err = D_Eliminar_Datos("TO001A", _Where)
+    End Sub
+    Public Shared Sub L_EliminarTO001C(_Id As String)
+        Dim _Where As String
+        Dim _Err As Boolean
+
+        _Where = "oacoanumi = " + _Id
+        _Err = D_Eliminar_Datos("TO001C", _Where)
+    End Sub
+    Public Shared Sub L_EliminarTO001DEstado(_Id As String, _estado As String)
+        Dim _Where As String
+        Dim _Err As Boolean
+
+        _Where = "oadoanumi = " + _Id + " and oadestado = " + _estado
+        _Err = D_Eliminar_Datos("TO001D", _Where)
     End Sub
 
     Public Shared Function L_PedidoGenerarCopia(numi As String) As String
