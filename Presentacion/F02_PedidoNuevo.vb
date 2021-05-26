@@ -59,9 +59,29 @@ Public Class F02_PedidoNuevo
 
         tbFechaDel.Value = Now.Date
         tbFechaAl.Value = Now.Date
-
+        P_prArmarComboCatCliente()
         'Ocultar boton Eliminar
         MBtEliminar.Visible = False
+    End Sub
+
+    Private Sub P_prArmarComboCatCliente()
+
+        Dim Dt As New DataTable
+        Dt = L_CategoriaPrecioGeneralSinCosto()
+        With CbCategoria.DropDownList
+            .Columns.Add(Dt.Columns(0).ToString).Width = 50
+            .Columns(0).Caption = "Código"
+
+
+
+            .Columns.Add(Dt.Columns(1).ToString).Width = 120
+            .Columns(1).Caption = "Descripción"
+        End With
+
+        CbCategoria.ValueMember = Dt.Columns(0).ToString
+        CbCategoria.DisplayMember = Dt.Columns(1).ToString
+        CbCategoria.DataSource = Dt
+        CbCategoria.Refresh()
     End Sub
     Private Sub _pCambiarFuente()
         Dim fuente As New Font("Tahoma", gi_fuenteTamano, FontStyle.Regular)
@@ -1174,7 +1194,7 @@ Public Class F02_PedidoNuevo
         MBtEliminar.Enabled = False
         MBtGrabar.Enabled = True
         Tb_Fecha.Enabled = True
-
+        CbCategoria.Visible = True
         'BBtn_Nuevo.Enabled = False
         'BBtn_Modificar.Enabled = False
         'BBtn_Eliminar.Enabled = False
@@ -1188,7 +1208,7 @@ Public Class F02_PedidoNuevo
         JGr_Productos.Enabled = True
         JGr_TipoProd.Enabled = True
         Tb_Estado.Enabled = True
-
+        lbCategoria.Visible = True
         cbDistribuidor.ReadOnly = False
         'cbPreVendedor.ReadOnly = False
 
@@ -1221,10 +1241,10 @@ Public Class F02_PedidoNuevo
         Tb_Obs2.ReadOnly = True
         Tb_PromCosumo.ReadOnly = True
         Tb_TotalPedidos3Meses.ReadOnly = True
-
+        CbCategoria.Visible = False
         cbDistribuidor.ReadOnly = True
         cbPreVendedor.ReadOnly = True
-
+        lbCategoria.Visible = False
         'BBtn_Nuevo.Enabled = True
         'BBtn_Modificar.Enabled = True
         'BBtn_Eliminar.Enabled = True
@@ -1284,7 +1304,7 @@ Public Class F02_PedidoNuevo
         Tb_CantProd2.Value = 0
         Tb_Fecha.Value = Now.Date
         dtpFechaVenc.Value = Now.Date
-
+        CbCategoria.SelectedIndex = 0
         If _nuevoBasePeriodico = True Then
             CheckBoxX1.Checked = False
             CheckBoxX2.Checked = False
@@ -2130,7 +2150,7 @@ Public Class F02_PedidoNuevo
         '_Modificar = True
         _PHabilitar()
         JGr_Clientes.Enabled = False
-        _PCargarGridProductosNuevo(Tb_CliCateg.Text)
+        ''_PCargarGridProductosNuevo(Tb_CliCateg.Text)
     End Sub
 
     Private Sub _PEliminarRegistro()
@@ -2322,7 +2342,7 @@ Public Class F02_PedidoNuevo
             JGr_TipoProd.Row = 0
 
             ''Carga los productos
-            _PCargarGridProductosNuevo(Tb_CliCateg.Text)
+            ''_PCargarGridProductosNuevo(Tb_CliCateg.Text)
             JGr_Productos.Focus()
             JGr_Productos.MoveTo(JGr_Productos.FilterRow)
             JGr_Productos.Col = 1
@@ -2571,11 +2591,12 @@ Public Class F02_PedidoNuevo
             dtTop3meses = L_PedidoCabecera_GeneralTotal3Meses(-1, " AND oaccli=" + codCliente.ToString + " AND oaest>=1 AND oaest<=4 ")
             Tb_TotalPedidos3Meses.Text = dtTop3meses.Rows.Count
 
-            Try
-                Tb_DireccionDetalle.Text = IIf(IsDBNull(JGr_Clientes.CurrentRow.Cells("CliDireccion").Value), "", JGr_Clientes.CurrentRow.Cells("CliDireccion").Value)
-            Catch ex As Exception
 
-            End Try
+            Try
+                    Tb_DireccionDetalle.Text = IIf(IsDBNull(JGr_Clientes.CurrentRow.Cells("CliDireccion").Value), "", JGr_Clientes.CurrentRow.Cells("CliDireccion").Value)
+                Catch ex As Exception
+
+                End Try
         End If
 
     End Sub
@@ -3677,5 +3698,8 @@ Public Class F02_PedidoNuevo
         Catch ex As Exception
             MostrarMensajeError(ex.Message)
         End Try
+    End Sub
+    Private Sub CbCategoria_ValueChanged(sender As Object, e As EventArgs) Handles CbCategoria.ValueChanged
+        _PCargarGridProductosNuevo(CbCategoria.Value)
     End Sub
 End Class
