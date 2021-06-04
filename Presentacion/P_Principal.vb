@@ -1673,7 +1673,7 @@ Public Class P_Principal
 
         F02_PedidoNuevo.AllowTransparency = True
         Dim frm As New F02_PedidoNuevo
-
+        frm.Concepto = 1
         frm._nameButton = btPediPedidoNuevo.Name
         frm._modulo = FP_Pedido
         frm.Show()
@@ -1748,6 +1748,15 @@ Public Class P_Principal
         Dim frm As New F1_Bancos
         frm._nameButton = btBancos.Name
         frm._modulo = FP_Configuracion
+        frm.Show()
+    End Sub
+
+    Private Sub btPediBonificacionNuevo_Click(sender As Object, e As EventArgs) Handles btPediBonificacionNuevo.Click
+        F02_PedidoNuevo.AllowTransparency = True
+        Dim frm As New F02_PedidoNuevo
+        frm.Concepto = 2
+        frm._nameButton = btPediPedidoNuevo.Name
+        frm._modulo = FP_Pedido
         frm.Show()
     End Sub
 

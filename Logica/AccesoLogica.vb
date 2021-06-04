@@ -1198,7 +1198,7 @@ Public Class AccesoLogica
         Return _Tabla
     End Function
 
-    Public Shared Sub L_PedidoCabecera_Grabar(ByRef _numi As String, _fecha As String, _hora As String, _idCli As String, _zona As String, distribuidor As String, _obs As String, _estado As String, _activoPasivo As String, _pedGen As String)
+    Public Shared Sub L_PedidoCabecera_Grabar(ByRef _numi As String, _fecha As String, _hora As String, _idCli As String, _zona As String, distribuidor As String, _obs As String, _estado As String, _activoPasivo As String, _pedGen As String, concepto As Integer)
         Dim _Actualizacion As String
         Dim _Err As Boolean
         Dim _Tabla As DataTable
@@ -1211,7 +1211,7 @@ Public Class AccesoLogica
 
         _Actualizacion = "'" + Date.Now.Date.ToString("yyyy/MM/dd") + "', '" + Now.Hour.ToString + ":" + Now.Minute.ToString + "' ,'" + L_Usuario + "'"
         Dim Sql As String
-        Sql = _numi + ",'" + Date.Now.Date.ToString("yyyy/MM/dd") + "','" + _hora + "'," + _idCli + "," + _zona + "," + distribuidor + ",'" + _obs + "',''," + _estado + "," + _activoPasivo + "," + _pedGen + "," + _Actualizacion
+        Sql = _numi + ",'" + Date.Now.Date.ToString("yyyy/MM/dd") + "','" + _hora + "'," + _idCli + "," + _zona + "," + distribuidor + ",'" + _obs + "',''," + _estado + "," + _activoPasivo + "," + _pedGen + "," + _Actualizacion + "," + Str(concepto)
         _Err = D_Insertar_Datos("TO001", Sql)
     End Sub
 
@@ -1370,7 +1370,7 @@ Public Class AccesoLogica
         distribuidor = _dtCabOri.Rows(0).Item("oarepa").ToString
         obs = _dtCabOri.Rows(0).Item("oaobs").ToString
         numiNew = ""
-        L_PedidoCabecera_Grabar(numiNew, Now.Date.ToString("yyyy/MM/dd"), Now.Hour.ToString("00") + ":" + Now.Minute.ToString("00"), numiCli, numiZona, distribuidor, obs, "1", "1", "2")
+        L_PedidoCabecera_Grabar(numiNew, Now.Date.ToString("yyyy/MM/dd"), Now.Hour.ToString("00") + ":" + Now.Minute.ToString("00"), numiCli, numiZona, distribuidor, obs, "1", "1", "2", 1)
 
         'grabar detalle
         Dim codProd, cant, precio, subTot, desc, total, flia As String
@@ -1531,21 +1531,23 @@ Public Class AccesoLogica
 
         Return _resultado
     End Function
-    Public Shared Function L_prListaPedidos() As DataTable
+    Public Shared Function L_prListaPedidos(Concepto As Integer) As DataTable
         Dim _Tabla As DataTable
         Dim _listParam As New List(Of Datos.DParametro)
         _listParam.Add(New Datos.DParametro("@tipo", 22))
         _listParam.Add(New Datos.DParametro("@oluact", L_Usuario))
+        _listParam.Add(New Datos.DParametro("@Concepto", Concepto))
         _Tabla = D_ProcedimientoConParam("sp_Mam_TO005", _listParam)
         Return _Tabla
     End Function
-    Public Shared Function L_prListaPedidosPorFecha(fechaI As String, fechaf As String) As DataTable
+    Public Shared Function L_prListaPedidosPorFecha(fechaI As String, fechaf As String, concepto As Integer) As DataTable
         Dim _Tabla As DataTable
         Dim _listParam As New List(Of Datos.DParametro)
         _listParam.Add(New Datos.DParametro("@tipo", 30))
         _listParam.Add(New Datos.DParametro("@fechai", fechaI))
         _listParam.Add(New Datos.DParametro("@fechaf", fechaf))
         _listParam.Add(New Datos.DParametro("@oluact", L_Usuario))
+        _listParam.Add(New Datos.DParametro("@Concepto", concepto))
         _Tabla = D_ProcedimientoConParam("sp_Mam_TO005", _listParam)
         Return _Tabla
     End Function

@@ -13,7 +13,10 @@ Imports System.IO
 Imports CrystalDecisions.Shared
 
 
+
 Public Class F02_PedidoNuevo
+
+    Public Concepto As Integer = 0
     Dim _inter As Integer = 0
 
 #Region "Variables"
@@ -62,6 +65,13 @@ Public Class F02_PedidoNuevo
         P_prArmarComboCatCliente()
         'Ocultar boton Eliminar
         MBtEliminar.Visible = False
+
+
+        If (Concepto = 1) Then
+            Me.Text = "P E D I D O S"
+        Else
+            Me.Text = "B O N I F I C A C I O N E S"
+        End If
     End Sub
 
     Private Sub P_prArmarComboCatCliente()
@@ -193,12 +203,12 @@ Public Class F02_PedidoNuevo
             JGr_Buscador.BoundMode = BoundMode.Bound
             If _nuevoBasePeriodico = True Then
                 ''JGr_Buscador.DataSource = L_PedidoCabecera_General_Pedido(-1, " AND oaest=10" + where)
-                JGr_Buscador.DataSource = L_prListaPedidos()
+                JGr_Buscador.DataSource = L_prListaPedidos(Concepto)
             Else
                 If tipo = 1 Then
-                    JGr_Buscador.DataSource = L_prListaPedidos()
+                    JGr_Buscador.DataSource = L_prListaPedidos(Concepto)
                 Else
-                    Dim tPedidos = L_prListaPedidosPorFecha(tbFechaDel.Value.Date.ToString("yyyy/MM/dd"), tbFechaAl.Value.Date.ToString("yyyy/MM/dd"))
+                    Dim tPedidos = L_prListaPedidosPorFecha(tbFechaDel.Value.Date.ToString("yyyy/MM/dd"), tbFechaAl.Value.Date.ToString("yyyy/MM/dd"), Concepto)
                     If tPedidos.Rows.Count = 0 Then
                         Throw New Exception("No se encontro registro con la fecha específicada")
                     End If
@@ -320,6 +330,9 @@ Public Class F02_PedidoNuevo
                 .Visible = False
             End With
             With JGr_Buscador.RootTable.Columns("oaap")
+                .Visible = False
+            End With
+            With JGr_Buscador.RootTable.Columns("concepto")
                 .Visible = False
             End With
             With JGr_Buscador.RootTable.Columns("oapg")
@@ -627,6 +640,14 @@ Public Class F02_PedidoNuevo
     Private Sub _PCargarGridProductosNuevo(idCatCli As Integer)
         'Dim dtProd, dtCatPrecios As New DataTable
         Dim dtProd2 As DataTable = L_ProductosPedido_GeneralNuevo(-1, idCatCli)
+
+        If (Concepto <> 1) Then
+            For i As Integer = 0 To dtProd2.Rows.Count - 1 Step 1
+                dtProd2.Rows(i).Item(3) = 0
+            Next
+        End If
+
+
 
         JGr_Productos.BoundMode = BoundMode.Bound
         JGr_Productos.DataSource = dtProd2
@@ -1636,7 +1657,7 @@ Public Class F02_PedidoNuevo
 
                 End If
 
-                L_PedidoCabecera_Grabar(Tb_Id.Text, Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, IIf(_nuevoBasePeriodico = True, "10", "1"), "1", "0")
+                L_PedidoCabecera_Grabar(Tb_Id.Text, Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, IIf(_nuevoBasePeriodico = True, "10", "1"), "1", "0", Concepto)
                 L_PedidoCabecera_GrabarExtencion(Tb_Id.Text, cbPreVendedor.Value.ToString, "2", "0", dtpFechaVenc.Value.ToString("yyyy/MM/dd"))
                 If (swTipoVenta.Value = False) Then  ''''Grabar Credito
                     L_prCajaGrabarCredito(Tb_Id.Text, Double.Parse(tbMontoCredito.Text))
@@ -1730,7 +1751,7 @@ Public Class F02_PedidoNuevo
 
                 'Volver al foco para uno nuevo
                 Tb_Fecha.Focus()
-                ToastNotification.Show(Me, "Codigo de Pedido " + Tb_Id.Text + " Grabado con Exito.", My.Resources.GRABACION_EXITOSA, 5000, eToastGlowColor.Green, eToastPosition.BottomLeft)
+                ToastNotification.Show(Me, "Codigo de Transaccion " + Tb_Id.Text + " Grabado con Exito.", My.Resources.GRABACION_EXITOSA, 5000, eToastGlowColor.Green, eToastPosition.BottomLeft)
                 _PLimpiar()
 
                 'ir a clientes
@@ -1813,7 +1834,7 @@ Public Class F02_PedidoNuevo
                 End If
 
 
-                ToastNotification.Show(Me, "Codigo de Pedido " + Tb_Id.Text + " Modificado con Exito.", My.Resources.GRABACION_EXITOSA, 5000, eToastGlowColor.Green, eToastPosition.BottomLeft)
+                ToastNotification.Show(Me, "Codigo de Transacción " + Tb_Id.Text + " Modificado con Exito.", My.Resources.GRABACION_EXITOSA, 5000, eToastGlowColor.Green, eToastPosition.BottomLeft)
                 '_Deshabilitar()
 
                 'TSB0_5.PerformClick()
@@ -2236,7 +2257,7 @@ Public Class F02_PedidoNuevo
         If grabar = True Then
             'GRABAR PEDIDO
             Dim idPedido As String = ""
-            L_PedidoCabecera_Grabar(idPedido, fecha, Now.Hour.ToString + ":" + Now.Minute.ToString, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, "1", "1", "1")
+            L_PedidoCabecera_Grabar(idPedido, fecha, Now.Hour.ToString + ":" + Now.Minute.ToString, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, "1", "1", "1", Concepto)
 
             'grabar detalle
             modificarDetallePedido()
@@ -2593,10 +2614,10 @@ Public Class F02_PedidoNuevo
 
 
             Try
-                    Tb_DireccionDetalle.Text = IIf(IsDBNull(JGr_Clientes.CurrentRow.Cells("CliDireccion").Value), "", JGr_Clientes.CurrentRow.Cells("CliDireccion").Value)
-                Catch ex As Exception
+                Tb_DireccionDetalle.Text = IIf(IsDBNull(JGr_Clientes.CurrentRow.Cells("CliDireccion").Value), "", JGr_Clientes.CurrentRow.Cells("CliDireccion").Value)
+            Catch ex As Exception
 
-                End Try
+            End Try
         End If
 
     End Sub
@@ -3086,7 +3107,7 @@ Public Class F02_PedidoNuevo
 
             End If
 
-            L_PedidoCabecera_Grabar(Tb_Id.Text, Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, IIf(_nuevoBasePeriodico = True, "10", "2"), "1", "0")
+            L_PedidoCabecera_Grabar(Tb_Id.Text, Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, IIf(_nuevoBasePeriodico = True, "10", "2"), "1", "0", Concepto)
             L_PedidoCabecera_GrabarExtencion(Tb_Id.Text, cbPreVendedor.Value.ToString, "2", "0", dtpFechaVenc.Value.ToString("yyyy/MM/dd"))
             If (swTipoVenta.Value = False) Then  ''''Grabar Credito
                 L_prCajaGrabarCredito(Tb_Id.Text, Double.Parse(tbMontoCredito.Text))

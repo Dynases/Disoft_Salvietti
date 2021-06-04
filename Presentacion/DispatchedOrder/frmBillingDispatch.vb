@@ -1753,7 +1753,7 @@ Public Class frmBillingDispatch
                 End If
             End If
 
-            L_PedidoCabecera_Grabar(Numi, Date.Now.Date.ToString("yyyy/MM/dd"), Hora, Cliente, 100, cbChoferes.Value.ToString, "", "2", "1", "0")
+            L_PedidoCabecera_Grabar(Numi, Date.Now.Date.ToString("yyyy/MM/dd"), Hora, Cliente, 100, cbChoferes.Value.ToString, "", "2", "1", "0", 1)
             L_PedidoCabecera_GrabarExtencion(Numi, Prevendedor, "2", "0", Date.Now.Date.ToString("yyyy/MM/dd"))
             L_prGrabarTO001C(Numi, cbChoferes.Value)
             L_GrabarTO001D(Numi, 4, "Distribución")
