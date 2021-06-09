@@ -75,13 +75,15 @@ Public Class frmDispatch
 
     Public Sub CargarZonas()
         Try
-            Dim listResult As List(Of VCombo) = New LZona().ListarCombo()
-
+            '' Dim listResult As List(Of VCombo) = New LZona().ListarCombo()
+            Dim listResult As List(Of VCombo) = New LPersonal().ListarCombo(ENTipoPersonal.VENDEDOR)
             dgjZona.BoundMode = Janus.Data.BoundMode.Bound
             dgjZona.DataSource = listResult
             dgjZona.RetrieveStructure()
 
             dgjZona.RootTable.Columns.Insert(0, New GridEXColumn("Check"))
+
+
             With dgjZona.RootTable.Columns("Check")
                 .Width = 20
                 .ShowRowSelector = True
@@ -155,7 +157,7 @@ Public Class frmDispatch
             Dim checks = Me.dgjZona.GetCheckedRows()
             Dim listIdZona = checks.Select(Function(a) Convert.ToInt32(a.Cells("Id").Value)).ToList()
             If (listIdZona.Count = 0) Then
-                Throw New Exception("Debe seleccionar por lo menos una zona.")
+                Throw New Exception("Debe seleccionar por lo menos un Vendedor.")
             End If
 
             Dim listResult = New LPedido().ListarPedidoDistribucion(listIdZona)

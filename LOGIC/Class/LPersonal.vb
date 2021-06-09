@@ -10,11 +10,11 @@ Public Class LPersonal
     End Sub
 
 #Region "Privado, metodos y funciones"
-    Private Function ListarCombo(tipo As ENTipoPersonal) As List(Of VCombo)
+    Public Function ListarCombo(tipo As ENTipoPersonal) As List(Of VCombo)
         Try
             Dim lCombo = New LCombo()
             Dim listResult = iPersonal.ListarCombo(tipo)
-            
+
             lCombo.ValidarCombo(listResult)
             lCombo.AdicionarSeleccionar(listResult)
 
