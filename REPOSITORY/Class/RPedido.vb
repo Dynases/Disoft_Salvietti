@@ -17,7 +17,7 @@ Public Class RPedido
                                   Join c In db.TC002 On a1.oaanumiprev Equals c.cbnumi
                                   Where (a.oaest = ENEstadoPedido.DICTADO Or a.oaest = ENEstadoPedido.PENDIENTE) And a.oaap = 1 And
                                       listIdZona.Contains(a1.oaanumiprev) And
-                                      Not db.TO001C.Select(Function(aa) aa.oacoanumi).ToList().Contains(a.oanumi)
+                                      Not db.TO001C.Select(Function(aa) aa.oacoanumi).ToList().Contains(a.oanumi) Order By a.oanumi Descending
                                   Select New VPedido_Dispatch With {
                                       .Id = a.oanumi,
                                       .Fecha = a.oafdoc,
@@ -41,12 +41,13 @@ Public Class RPedido
                                   Join b In db.TC004 On a.oaccli Equals b.ccnumi
                                   Join c In db.TC002 On a1.oaanumiprev Equals c.cbnumi
                                   Join d In db.TO001C On a.oanumi Equals d.oacoanumi
-                                  Where a.oaest = estado And d.oaccbnumi = idChofer And a.oaap = 1
+                                  Where (a.oaest = estado Or a.oaest = ENEstadoPedido.PENDIENTE) And d.oaccbnumi = idChofer And a.oaap = 1 Order By a.oanumi Descending
                                   Select New VPedido_BillingDispatch With {
                                       .Id = a.oanumi,
                                       .Fecha = a.oafdoc,
                                       .NombreCliente = b.ccdesc,
                                       .NombreVendedor = c.cbdesc,
+                                      .Tipo = If(a.Concepto = 1, "Pedido", "Bonificación"),
                                       .NroFactura = d.oacnrofac,
                                       .idZona = a.oazona,
                                       .observacion = a.oaobs

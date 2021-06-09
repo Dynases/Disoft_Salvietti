@@ -1252,7 +1252,13 @@ Public Class frmBillingDispatch
             .Visible = True
             .Position = 3
         End With
-
+        With dgjPedido.RootTable.Columns("Tipo")
+            .Caption = "Transacción"
+            .Width = 150
+            .CellStyle.TextAlignment = Janus.Windows.GridEX.TextAlignment.Near
+            .Visible = True
+            .Position = 3
+        End With
         With dgjPedido.RootTable.Columns("idZona")
             .Caption = "Zona"
             .Width = 120
@@ -1314,6 +1320,13 @@ Public Class frmBillingDispatch
             '.ColumnHeaders = InheritableBoolean.True
         End With
         dgjPedido.VisualStyle = VisualStyle.Office2007
+
+
+        Dim fc As GridEXFormatCondition
+        fc = New GridEXFormatCondition(dgjPedido.RootTable.Columns("Tipo"), ConditionOperator.Contains, "Bonificación")
+        'fc.FormatStyle.FontBold = TriState.True
+        fc.FormatStyle.BackColor = Color.Gold    'Color.Tan
+        dgjPedido.RootTable.FormatConditions.Add(fc)
     End Sub
 
     Private Sub CargarProductos(idPedido As Integer)
