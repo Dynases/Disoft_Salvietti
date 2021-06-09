@@ -96,7 +96,7 @@ Public Class frmDispatch
             End With
 
             With dgjZona.RootTable.Columns("Descripcion")
-                .Caption = "Zonas"
+                .Caption = "Vendedores"
                 .Width = 220
                 .CellStyle.TextAlignment = Janus.Windows.GridEX.TextAlignment.Near
                 .Visible = True
