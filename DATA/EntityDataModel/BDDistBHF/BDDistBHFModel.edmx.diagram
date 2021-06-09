@@ -35,7 +35,7 @@
         <EntityTypeShape EntityType="BDDistBHFModel.TI0052" Width="1.5" PointX="15.75" PointY="11.75" />
         <EntityTypeShape EntityType="BDDistBHFModel.TL001" Width="1.5" PointX="15.75" PointY="15.75" />
         <EntityTypeShape EntityType="BDDistBHFModel.TL002" Width="1.5" PointX="17.75" PointY="0.75" />
-        <EntityTypeShape EntityType="BDDistBHFModel.TO001" Width="1.5" PointX="17.75" PointY="3.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.TO001" Width="1.5" PointX="17.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="BDDistBHFModel.TO001C" Width="1.5" PointX="17.75" PointY="8.75" />
         <EntityTypeShape EntityType="BDDistBHFModel.TO004" Width="1.5" PointX="17.75" PointY="11.75" />
         <EntityTypeShape EntityType="BDDistBHFModel.TO005" Width="1.5" PointX="0.75" PointY="2.75" />
@@ -141,6 +141,16 @@
         <EntityTypeShape EntityType="BDDistBHFModel.VR_GO_Factura" Width="1.5" PointX="19.375" PointY="30.75" />
         <EntityTypeShape EntityType="BDDistBHFModel.TO0011" Width="1.5" PointX="36.375" PointY="0.75" />
         <EntityTypeShape EntityType="BDDistBHFModel.VR_GO_DespachoXProducto" Width="1.5" PointX="36.375" PointY="4.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.Empresa" Width="1.5" PointX="13.75" PointY="37.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.EmpresaReporte" Width="1.5" PointX="16" PointY="37" />
+        <EntityTypeShape EntityType="BDDistBHFModel.Sucursales" Width="1.5" PointX="13.75" PointY="28.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.TC0014" Width="1.5" PointX="0.75" PointY="37.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.TC004C" Width="1.5" PointX="7.75" PointY="37.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.Detalle" Width="1.5" PointX="37.75" PointY="9.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.DetalleBackup" Width="1.5" PointX="37.75" PointY="13.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.TC0001" Width="1.5" PointX="21.75" PointY="37.75" />
+        <EntityTypeShape EntityType="BDDistBHFModel.TC012" Width="1.5" PointX="37.75" PointY="23.75" />
+        <AssociationConnector Association="BDDistBHFModel.FK_EmpresaReporte_Empresa" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

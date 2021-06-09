@@ -98,6 +98,18 @@
     <Compile Include="EntityDataModel\BDDistBHF\CM0011.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\Detalle.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\DetalleBackup.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\Empresa.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\EmpresaReporte.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\sp_dg_RAsistencia_Result.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
@@ -122,10 +134,16 @@
     <Compile Include="EntityDataModel\BDDistBHF\sp_Mam_VentasCredito_Result.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\Sucursales.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TA001.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TB001.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\TC0001.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TC001.vb">
@@ -138,6 +156,9 @@
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TC0013.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\TC0014.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TC002.vb">
@@ -164,6 +185,9 @@
     <Compile Include="EntityDataModel\BDDistBHF\TC004B.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\TC004C.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TC005.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
@@ -180,6 +204,9 @@
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TC0111.vb">
+      <DependentUpon>BDDistBHFModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityDataModel\BDDistBHF\TC012.vb">
       <DependentUpon>BDDistBHFModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityDataModel\BDDistBHF\TCA001.vb">

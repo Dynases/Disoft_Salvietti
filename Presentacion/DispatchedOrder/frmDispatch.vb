@@ -204,7 +204,13 @@ Public Class frmDispatch
                 .Visible = True
                 .Position = 4
             End With
-
+            With dgjPedido.RootTable.Columns("Tipo")
+                .Caption = "Transacción"
+                .Width = 150
+                .CellStyle.TextAlignment = Janus.Windows.GridEX.TextAlignment.Center
+                .Visible = True
+                .Position = 5
+            End With
             dgjPedido.RootTable.Columns.Add(New GridEXColumn("Check"))
             With dgjPedido.RootTable.Columns("Check")
                 .Caption = "Despacho"
@@ -231,6 +237,13 @@ Public Class frmDispatch
         Catch ex As Exception
             Throw New Exception(ex.Message)
         End Try
+
+        Dim fc As GridEXFormatCondition
+        fc = New GridEXFormatCondition(dgjPedido.RootTable.Columns("Tipo"), ConditionOperator.Contains, "Bonificación")
+        'fc.FormatStyle.FontBold = TriState.True
+        fc.FormatStyle.BackColor = Color.Gold    'Color.Tan
+        dgjPedido.RootTable.FormatConditions.Add(fc)
+
     End Sub
 
     Private Sub CargarProductos(idPedido As Integer)

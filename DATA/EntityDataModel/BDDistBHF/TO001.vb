@@ -25,5 +25,6 @@ Partial Public Class TO001
     Public Property oafact As Nullable(Of Date)
     Public Property oahact As String
     Public Property oauact As String
+    Public Property Concepto As Nullable(Of Integer)
 
 End Class

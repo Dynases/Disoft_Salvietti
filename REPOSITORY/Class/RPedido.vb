@@ -23,6 +23,7 @@ Public Class RPedido
                                       .Fecha = a.oafdoc,
                                       .NombreCliente = b.ccdesc,
                                       .NombreVendedor = c.cbdesc,
+                                      .Tipo = If(a.Concepto = 1, "Pedido", "Bonificación"),
                                       .idZona = a.oazona
                                       }).ToList()
                 Return listResult
