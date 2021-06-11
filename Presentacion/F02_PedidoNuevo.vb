@@ -2480,8 +2480,7 @@ Public Class F02_PedidoNuevo
     Private Sub JGr_DetallePedido_EditingCell(sender As Object, e As EditingCellEventArgs) Handles JGr_DetallePedido.EditingCell
         If (_fnAccesible()) Then
             If gi_userRol = 1 Then
-                If e.Column.Index = JGr_DetallePedido.RootTable.Columns("Precio").Index Or
-                    e.Column.Index = JGr_DetallePedido.RootTable.Columns("Descuento").Index Or
+                If e.Column.Index = JGr_DetallePedido.RootTable.Columns("Descuento").Index Or
                     e.Column.Index = JGr_DetallePedido.RootTable.Columns("CantidadConversion").Index Then
                     e.Cancel = False
                 Else
