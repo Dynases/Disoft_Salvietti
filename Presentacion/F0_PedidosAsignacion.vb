@@ -19,7 +19,7 @@ Public Class F0_PedidosAsignacion
     Dim _overlay3 As GMapOverlay
     Dim _soloRepartidor As Integer = 1
     'Dim _colCkeck = 23 '21 '19
-    Dim _colCkeck = 24
+    Dim _colCkeck = 25
     Public _nameButton As String
     Public _tab As SuperTabItem
     Public _modulo As SideNavItem
@@ -349,6 +349,9 @@ Public Class F0_PedidosAsignacion
             With objGrid.RootTable.Columns("cceven")
                 .Visible = False
             End With
+            With objGrid.RootTable.Columns("concepto")
+                .Visible = False
+            End With
 
             'objGrid.RootTable.Columns.Add("Check")
             With objGrid.RootTable.Columns(_colCkeck)
@@ -376,7 +379,7 @@ Public Class F0_PedidosAsignacion
             End With
 
             'poner color a la fila de acuerdo a la condicion 
-            Dim fc, fc1, fc2, fc3, fc66, fcRecClient, fcRecRepart As GridEXFormatCondition
+            Dim fc, fc1, fc2, fc3, fc66, fc88, fcRecClient, fcRecRepart As GridEXFormatCondition
             fc = New GridEXFormatCondition(objGrid.RootTable.Columns("reclamo"), ConditionOperator.Equal, 1)
             'fc.FormatStyle.BackColor = Color.LightYellow
             fc.FormatStyle.ForeColor = Color.Red
@@ -387,6 +390,11 @@ Public Class F0_PedidosAsignacion
             f67.FormatStyle.BackColor = Color.Red
             f67.FormatStyle.ForeColor = Color.White
             f67.FormatStyle.FontBold = TriState.True
+
+            fc88 = New GridEXFormatCondition(objGrid.RootTable.Columns("concepto"), ConditionOperator.NotEqual, 1)
+            'fc.FormatStyle.BackColor = Color.LightYellow
+            fc88.FormatStyle.BackColor = Color.Gold
+
 
 
 
@@ -413,12 +421,16 @@ Public Class F0_PedidosAsignacion
             fcRecClient = New GridEXFormatCondition(objGrid.RootTable.Columns("tipoRecCliente"), ConditionOperator.Equal, 1)
             fcRecClient.FormatStyle.BackColor = Color.LightGreen
 
+
+            Dim dt As DataTable = CType(objGrid.DataSource, DataTable)
             objGrid.RootTable.FormatConditions.Add(fc)
             objGrid.RootTable.FormatConditions.Add(fc1)
             objGrid.RootTable.FormatConditions.Add(fc2)
             objGrid.RootTable.FormatConditions.Add(fc3)
             objGrid.RootTable.FormatConditions.Add(fc66)
             objGrid.RootTable.FormatConditions.Add(f67)
+            objGrid.RootTable.FormatConditions.Add(fc88)
+
             objGrid.RootTable.FormatConditions.Add(fcRecRepart)
             objGrid.RootTable.FormatConditions.Add(fcRecClient)
 
