@@ -175,19 +175,20 @@ Public Class F0_PedidosAsignacion
             Dim dtReg As DataTable
             If codZona = "" Then
                 If codRep = "-1" Then
-                    dtReg = L_PedidoCabecera_General(-1, " AND (oaest=" + estado + " ) AND oaap=1")
+                    ''oaap=1
+                    dtReg = L_PedidoCabecera_General(-1, " AND (oaest=" + estado + " ) ")
                 Else
                     If estado = "1" Then
-                        dtReg = L_PedidoCabecera_GeneralSoloRepartidor(-1, " AND (oaest=" + estado + " ) AND oaap=1" + " AND tl0012.lccbnumi=" + codRep)
+                        dtReg = L_PedidoCabecera_GeneralSoloRepartidor(-1, " AND (oaest=" + estado + " )" + " AND tl0012.lccbnumi=" + codRep)
                     Else
-                        dtReg = L_PedidoCabecera_GeneralSoloRepartidor(-1, " AND (oaest=" + estado + " ) AND oaap=1" + " AND tl0012.lccbnumi=" + codRep)
+                        dtReg = L_PedidoCabecera_GeneralSoloRepartidor(-1, " AND (oaest=" + estado + " )" + " AND tl0012.lccbnumi=" + codRep)
                     End If
                 End If
             Else
                 If codRep = "-1" Then
-                    dtReg = L_PedidoCabecera_General(-1, " AND (oaest=" + estado + ") AND oazona= " + codZona + " AND oaap=1")
+                    dtReg = L_PedidoCabecera_General(-1, " AND (oaest=" + estado + ") AND oazona= " + codZona)
                 Else
-                    dtReg = L_PedidoCabecera_General(-1, " AND (oaest=" + estado + " ) AND oazona= " + codZona + " AND oarepa=" + codRep + " AND oaap=1")
+                    dtReg = L_PedidoCabecera_General(-1, " AND (oaest=" + estado + " ) AND oazona= " + codZona + " AND oarepa=" + codRep)
                 End If
 
             End If
@@ -380,6 +381,15 @@ Public Class F0_PedidosAsignacion
             'fc.FormatStyle.BackColor = Color.LightYellow
             fc.FormatStyle.ForeColor = Color.Red
 
+            Dim f67 As GridEXFormatCondition
+            f67 = New GridEXFormatCondition(objGrid.RootTable.Columns("oaap"), ConditionOperator.NotEqual, 1)
+            'fc.FormatStyle.BackColor = Color.LightYellow
+            f67.FormatStyle.BackColor = Color.Red
+            f67.FormatStyle.ForeColor = Color.White
+            f67.FormatStyle.FontBold = TriState.True
+
+
+
             fc1 = New GridEXFormatCondition(objGrid.RootTable.Columns("oapg"), ConditionOperator.Equal, 1)
             fc1.FormatStyle.BackColor = Color.LightGreen
 
@@ -408,7 +418,7 @@ Public Class F0_PedidosAsignacion
             objGrid.RootTable.FormatConditions.Add(fc2)
             objGrid.RootTable.FormatConditions.Add(fc3)
             objGrid.RootTable.FormatConditions.Add(fc66)
-
+            objGrid.RootTable.FormatConditions.Add(f67)
             objGrid.RootTable.FormatConditions.Add(fcRecRepart)
             objGrid.RootTable.FormatConditions.Add(fcRecClient)
 
@@ -860,63 +870,75 @@ Public Class F0_PedidosAsignacion
         Dim i, cant, codPedido As Integer
         Dim estado As Boolean
         cant = 0
+
+
+
         For i = 0 To JGr_Registros1.RowCount - 1
             JGr_Registros1.Row = i
-            estado = JGr_Registros1.GetValue("Check")
-            If estado = True Then
-                codPedido = JGr_Registros1.GetValue("CodPedido")
-                L_PedidoEstados_Grabar(codPedido, "2", Date.Now.Date.ToString("yyyy/MM/dd"), Now.Hour.ToString + ":" + Now.Minute.ToString, gs_user)
-                L_PedidoCabacera_ModificarEstado(codPedido, "2")
-                L_PedidoCabacera_ModificarCodRep(codPedido, Tb_CodRep1.Text)
-                cant = cant + 1
+
+            If (JGr_Registros1.GetValue("oaap") = 1) Then
+                estado = JGr_Registros1.GetValue("Check")
+                If estado = True Then
+                    codPedido = JGr_Registros1.GetValue("CodPedido")
+                    L_PedidoEstados_Grabar(codPedido, "2", Date.Now.Date.ToString("yyyy/MM/dd"), Now.Hour.ToString + ":" + Now.Minute.ToString, gs_user)
+                    L_PedidoCabacera_ModificarEstado(codPedido, "2")
+                    L_PedidoCabacera_ModificarCodRep(codPedido, Tb_CodRep1.Text)
+                    cant = cant + 1
 
 
-                Dim objListDetalle As New List(Of RequestDetail)
+                    Dim objListDetalle As New List(Of RequestDetail)
 
-                Dim codProd, cantidad, precio, subTotal As String
-                For Each fil As GridEXRow In JGr_Detalles1.GetRows
-                    codProd = fil.Cells("CodProd").Value.ToString
-                    cantidad = fil.Cells("Cantidad").Value.ToString
-                    precio = fil.Cells("Precio").Value.ToString
-                    subTotal = fil.Cells("Monto").Value.ToString
+                    Dim codProd, cantidad, precio, subTotal As String
+                    For Each fil As GridEXRow In JGr_Detalles1.GetRows
+                        codProd = fil.Cells("CodProd").Value.ToString
+                        cantidad = fil.Cells("Cantidad").Value.ToString
+                        precio = fil.Cells("Precio").Value.ToString
+                        subTotal = fil.Cells("Monto").Value.ToString
 
-                    objListDetalle.Add(New RequestDetail(codPedido, codProd, cantidad, precio, subTotal, L_ClaseGetProducto(codProd)))
-                Next
+                        objListDetalle.Add(New RequestDetail(codPedido, codProd, cantidad, precio, subTotal, L_ClaseGetProducto(codProd)))
+                    Next
 
-                If (gi_notiPed = 1) Then
-                    '-----------------'MANDAR LA NOTIFICACION DEL PEDIDO '-----------------------------------------------
-                    Dim objResult As New Result
-                    Dim dtRepartidor As DataTable = L_fnObtenerRepartidor(JGr_Registros1.GetValue("zona").ToString)
-                    Dim codRep As String = "-1"
-                    If dtRepartidor.Rows.Count > 0 Then
-                        codRep = dtRepartidor.Rows(0).Item("lccbnumi").ToString
-                    End If
-                    'Dim s As String = JGr_Registros1.GetValue("codCliente").ToString
-                    Dim objPedido As New RequestHeader(codPedido, Date.Now.Date.ToString("yyyy-MM-dd"),
-                                                       JGr_Registros1.GetValue("hora").ToString,
-                                                       JGr_Registros1.GetValue("ccnumi").ToString,
-                                                       JGr_Registros1.GetValue("zona"),
-                                                       codRep, JGr_Registros1.GetValue("ObsPedido").ToString, "",
-                                                        "1", "1", "0",
-                                                       Date.Now.Date.ToString("yyyy-MM-dd"),
-                                                       Now.Hour.ToString + ":" + Now.Minute.ToString, gs_user,
-                                                       objListDetalle, L_ClaseGetCliente(L_fnObtenerTabla("oaccli", "TO001", "oanumi=" + codPedido.ToString).Rows(0).Item("oaccli").ToString))
-                    Dim dtLlave As DataTable = L_TC0022General(codRep)
-                    If dtLlave.Rows.Count > 0 Then
-                        Dim llaveRep As String = dtLlave(0).Item("ckidfsm").ToString
-                        objResult.fcmToken = llaveRep
-                        objResult.mRequestHeader = objPedido
-                        Dim respuesta As Boolean = JsonApiClient._prMandarNotificacion(objResult)
-                        If respuesta = False Then
-                            'ToastNotification.Show(Me, "El Pedido no se pudo enviar a la app del repartidor".ToUpper, My.Resources.WARNING, 10000, eToastGlowColor.Red, eToastPosition.TopCenter)
+                    If (gi_notiPed = 1) Then
+                        '-----------------'MANDAR LA NOTIFICACION DEL PEDIDO '-----------------------------------------------
+                        Dim objResult As New Result
+                        Dim dtRepartidor As DataTable = L_fnObtenerRepartidor(JGr_Registros1.GetValue("zona").ToString)
+                        Dim codRep As String = "-1"
+                        If dtRepartidor.Rows.Count > 0 Then
+                            codRep = dtRepartidor.Rows(0).Item("lccbnumi").ToString
                         End If
-                    Else
-                        'ToastNotification.Show(Me, "no se pudo enviar el pedido al repartidor!!! , ".ToUpper + "el repartidor con codigo: ".ToUpper + codRep + " no tiene grabado su llave en la tabla TC0022", My.Resources.WARNING, 10000, eToastGlowColor.Red, eToastPosition.TopCenter)
+                        'Dim s As String = JGr_Registros1.GetValue("codCliente").ToString
+                        Dim objPedido As New RequestHeader(codPedido, Date.Now.Date.ToString("yyyy-MM-dd"),
+                                                           JGr_Registros1.GetValue("hora").ToString,
+                                                           JGr_Registros1.GetValue("ccnumi").ToString,
+                                                           JGr_Registros1.GetValue("zona"),
+                                                           codRep, JGr_Registros1.GetValue("ObsPedido").ToString, "",
+                                                            "1", "1", "0",
+                                                           Date.Now.Date.ToString("yyyy-MM-dd"),
+                                                           Now.Hour.ToString + ":" + Now.Minute.ToString, gs_user,
+                                                           objListDetalle, L_ClaseGetCliente(L_fnObtenerTabla("oaccli", "TO001", "oanumi=" + codPedido.ToString).Rows(0).Item("oaccli").ToString))
+                        Dim dtLlave As DataTable = L_TC0022General(codRep)
+                        If dtLlave.Rows.Count > 0 Then
+                            Dim llaveRep As String = dtLlave(0).Item("ckidfsm").ToString
+                            objResult.fcmToken = llaveRep
+                            objResult.mRequestHeader = objPedido
+                            Dim respuesta As Boolean = JsonApiClient._prMandarNotificacion(objResult)
+                            If respuesta = False Then
+                                'ToastNotification.Show(Me, "El Pedido no se pudo enviar a la app del repartidor".ToUpper, My.Resources.WARNING, 10000, eToastGlowColor.Red, eToastPosition.TopCenter)
+                            End If
+                        Else
+                            'ToastNotification.Show(Me, "no se pudo enviar el pedido al repartidor!!! , ".ToUpper + "el repartidor con codigo: ".ToUpper + codRep + " no tiene grabado su llave en la tabla TC0022", My.Resources.WARNING, 10000, eToastGlowColor.Red, eToastPosition.TopCenter)
+                        End If
                     End If
+
+
                 End If
 
+            Else
 
+                Dim id As Integer = JGr_Registros1.GetValue("CodPedido")
+                ToastNotification.Show(Me, "El Pedido # " + Str(id) + " No puede ser asignado ya que es un pedido anulado", My.Resources.WARNING, 10000, eToastGlowColor.Red, eToastPosition.BottomCenter)
             End If
+
         Next
 
         ToastNotification.Show(Me, Str(cant) + " Pedidos Asignados Exitosamente", My.Resources.GRABACION_EXITOSA, 5000, eToastGlowColor.Green, eToastPosition.TopCenter)
@@ -944,13 +966,20 @@ Public Class F0_PedidosAsignacion
         For i = 0 To JGr_Registros2.RowCount - 1
             JGr_Registros2.Row = i
             estado = JGr_Registros2.GetValue("Check")
-            If estado = True Then
-                codPedido = JGr_Registros2.GetValue("CodPedido")
-                L_PedidoEstados_Grabar(codPedido, "3", Date.Now.Date.ToString("yyyy/MM/dd"), Now.Hour.ToString + ":" + Now.Minute.ToString, gs_user)
-                L_PedidoCabacera_ModificarEstado(codPedido, "3")
-                L_PedidoCabacera_ModificarEntrega(codPedido, "1")
-                cant = cant + 1
+
+            If (JGr_Registros2.GetValue("oaap") = 1) Then
+
+                If estado = True Then
+                    codPedido = JGr_Registros2.GetValue("CodPedido")
+                    L_PedidoEstados_Grabar(codPedido, "3", Date.Now.Date.ToString("yyyy/MM/dd"), Now.Hour.ToString + ":" + Now.Minute.ToString, gs_user)
+                    L_PedidoCabacera_ModificarEstado(codPedido, "3")
+                    L_PedidoCabacera_ModificarEntrega(codPedido, "1")
+                    cant = cant + 1
+                End If
+            Else
+                ToastNotification.Show(Me, "El Pedido # " + Str(JGr_Registros1.GetValue("CodPedido")) + " No puede ser Entregado ya que es un pedido anulado", My.Resources.WARNING, 10000, eToastGlowColor.Red, eToastPosition.BottomCenter)
             End If
+
         Next
 
         ToastNotification.Show(Me, Str(cant) + " Pedidos Entregados Exitosamente", My.Resources.GRABACION_EXITOSA, 5000, eToastGlowColor.Green, eToastPosition.TopCenter)

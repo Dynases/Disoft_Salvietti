@@ -1605,7 +1605,8 @@ Public Class F02_PedidoNuevo
             End If
 
 
-            If (_BanderaDescuentos = False) Then
+            If (_BanderaDescuentos = False And Concepto = 1) Then
+
                 ToastNotification.Show(Me, "Se modificó cantidad y/o precio, por favor vuelva a presione el botón aplicar descuentos".ToUpper, My.Resources.WARNING, 5500, eToastGlowColor.Green, eToastPosition.BottomCenter)
                 _Error = True
 
@@ -1657,7 +1658,7 @@ Public Class F02_PedidoNuevo
 
                 End If
 
-                L_PedidoCabecera_Grabar(Tb_Id.Text, Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, IIf(_nuevoBasePeriodico = True, "10", "1"), "1", "0", Concepto)
+                L_PedidoCabecera_Grabar(Tb_Id.Text, Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, Tb_CliCod.Text, Tb_CliCodZona.Text, cbDistribuidor.Value.ToString, Tb_Observaciones.Text, IIf(_nuevoBasePeriodico = True, "10", "2"), "1", "0", Concepto)
                 L_PedidoCabecera_GrabarExtencion(Tb_Id.Text, cbPreVendedor.Value.ToString, "2", "0", dtpFechaVenc.Value.ToString("yyyy/MM/dd"))
                 If (swTipoVenta.Value = False) Then  ''''Grabar Credito
                     L_prCajaGrabarCredito(Tb_Id.Text, Double.Parse(tbMontoCredito.Text))
@@ -1699,7 +1700,7 @@ Public Class F02_PedidoNuevo
 
 
                 'grabar estado del pedido
-                L_PedidoEstados_Grabar(Tb_Id.Text, IIf(_nuevoBasePeriodico = True, "10", "1"), Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, gs_user)
+                L_PedidoEstados_Grabar(Tb_Id.Text, IIf(_nuevoBasePeriodico = True, "10", "2"), Date.Now.Date.ToString("yyyy/MM/dd"), Tb_Hora.Text, gs_user)
 
                 ''actualizar el promedio de pedidos del cliente
                 ''If _nuevoBasePeriodico = False Then
@@ -2418,6 +2419,11 @@ Public Class F02_PedidoNuevo
                         nuevaFila("cadesc") = descrip
                         nuevaFila("obpbase") = precio
                         nuevaFila("obdesc") = 0
+                        If (Concepto <> 1) Then
+                            nuevaFila("obptot") = 0
+                            nuevaFila("obtotal") = 0
+                        End If
+
                         nuevaFila("obfamilia") = familia
                         nuevaFila("obcampo1") = atributo
                         nuevaFila("iacant") = stock
@@ -3697,7 +3703,9 @@ Public Class F02_PedidoNuevo
                     If atributo = -1 Then
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obpcant") = totalCantidad
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obCantidad") = Tb_CantProd2.Value
+                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obdesc") = 0
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obptot") = CDbl(1) * (precio / unidadConversion)
+                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obtotal") = CDbl(1) * (precio / unidadConversion)
 
                         JGr_Productos.Focus()
                         JGr_Productos.MoveTo(JGr_Productos.FilterRow)
@@ -3706,7 +3714,8 @@ Public Class F02_PedidoNuevo
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obpcant") = totalCantidad
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obCantidad") = Tb_CantProd2.Value
                         CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obptot") = CDbl(totalCantidad) * (precio / unidadConversion)
-
+                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obdesc") = 0
+                        CType(JGr_DetallePedido.DataSource, DataTable).Rows(pos).Item("obtotal") = CDbl(1) * (precio / unidadConversion)
                         JGr_Productos.Focus()
                         JGr_Productos.MoveTo(JGr_Productos.FilterRow)
                         JGr_Productos.Col = -1
@@ -3721,5 +3730,12 @@ Public Class F02_PedidoNuevo
     End Sub
     Private Sub CbCategoria_ValueChanged(sender As Object, e As EventArgs) Handles CbCategoria.ValueChanged
         _PCargarGridProductosNuevo(CbCategoria.Value)
+
+        If (Tb_Observaciones.ReadOnly = False) Then
+
+
+            CType(JGr_DetallePedido.DataSource, DataTable).Rows.Clear()
+
+        End If
     End Sub
 End Class
